@@ -3,7 +3,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
-const MOVIES = require('./movies-data-small.json')
+const MOVIES = require('./movies-small.json')
 
 const app = express()
 
@@ -23,7 +23,6 @@ app.use(function validateBearerToken(req, res, next) {
   next()
 })
 
-/*const validTypes = [`Bug`, `Dark`, `Dragon`, `Electric`, `Fairy`, `Fighting`, `Fire`, `Flying`, `Ghost`, `Grass`, `Ground`, `Ice`, `Normal`, `Poison`, `Psychic`, `Rock`, `Steel`, `Water`]*/
 
 /*{
   "filmtv_ID": 2,
@@ -41,30 +40,47 @@ app.use(function validateBearerToken(req, res, next) {
 
 app.get('/movie', function handleGetMovie(req, res) {
   let response = MOVIES;
+  console.log(response);
 
-  /* When searching by genre, users are searching for whether the Movie's genre includes a specified string. The search should be case insensitive. */
+  /* When searching by name, users are searching for whether the Movie's name includes a specified string. The search should be case insensitive. */
   if (req.query.name) {
-    response = response.filter(pokemon =>
+    response = response.filter(MOVIES =>
       // case insensitive searching
-      pokemon.name.toLowerCase().includes(req.query.name.toLowerCase())
+      MOVIES.film_title.toLowerCase().includes(req.query.name.toLowerCase())
     )
   }
 
+   /* When searching by genre, users are searching for whether the Movie's genre includes a specified string. The search should be case insensitive. */
+   if (req.query.genre) {
+    response = response.filter(MOVIES =>
+      // case insensitive searching
+      MOVIES.genre.toLowerCase().includes(req.query.genre.toLowerCase())
+    )
+  }
+
+
+
   /* When searching by country, users are searching for whether the Movie's country includes a specified string. The search should be case insensitive. */
-  if (req.query.type) {
-    response = response.filter(pokemon =>
-      pokemon.type.includes(req.query.type)
+  if (req.query.country) {
+    response = response.filter(MOVIES =>
+      // case insensitive searching
+      MOVIES.country.toLowerCase().includes(req.query.country.toLowerCase())
     )
   }
 
   /*  When searching by average vote, users are searching for Movies with an avg_vote that is greater than or equal to the supplied number. */
+  if (req.query.avg_vote) {
+    response = response.filter(MOVIES =>
+      // case insensitive searching
+      Number(MOVIES.avg_vote) >= Number(req.query.avg_vote)
+    )
+  }
 
-  
 
   res.json(response)
 })
 
-const PORT = 8000
+const PORT = 8080
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`)
