@@ -2,7 +2,7 @@
   "name": "moviedex-api",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha",
     "start": "node server.js",
@@ -23,5 +23,8 @@
     "mocha": "^8.2.1",
     "nodemon": "^2.0.7",
     "supertest": "^6.1.1"
-  }
+  },
+  "engines": {
+       "node": "15.5.1"
+     }
 }

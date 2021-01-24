@@ -7,7 +7,8 @@ const MOVIES = require('./movies-small.json')
 
 const app = express()
 
-app.use(morgan('dev'))
+const morganSetting = process.env.NODE_ENV === 'production' ? 'tiny' : 'common'
+app.use(morgan(morganSetting))
 app.use(helmet())
 app.use(cors())
 
@@ -16,26 +17,12 @@ app.use(function validateBearerToken(req, res, next) {
   const apiToken = process.env.API_TOKEN
   const authToken = req.get('Authorization')
 
-  if (!authToken || authToken.split(' ')[1] !== apiToken) {
+  if (!authToken || authToken !== apiToken) {
     return res.status(401).json({ error: 'Unauthorized request' })
   }
   // move to the next middleware
   next()
 })
-
-
-/*{
-  "filmtv_ID": 2,
-  "film_title": "Bugs Bunny's Third Movie: 1001 Rabbit Tales",
-  "year": 1982,
-  "genre": "Animation",
-  "duration": 76,
-  "country": "United States",
-  "director": "David Detiege, Art Davis, Bill Perez",
-  "actors": "N/A",
-  "avg_vote": 7.7,
-  "votes": 28
-}*/
 
 
 app.get('/movie', function handleGetMovie(req, res) {
@@ -76,11 +63,21 @@ app.get('/movie', function handleGetMovie(req, res) {
     )
   }
 
+  app.use((error, req, res, next) => {
+    let response
+    if (process.env.NODE_ENV === 'production') {
+      response = { error: { message: 'server error' }}
+    } else {
+      response = { error }
+    }
+    res.status(500).json(response)
+  })
+
 
   res.json(response)
 })
 
-const PORT = 8080
+const PORT = process.env.PORT || 8080
 
 app.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`)
